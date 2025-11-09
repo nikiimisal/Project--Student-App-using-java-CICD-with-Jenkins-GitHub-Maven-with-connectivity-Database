@@ -29,8 +29,7 @@
 * **Java (JDK 17)** – Application runtime  
 * **Maven** – Build automation tool  
 * **GitHub Webhooks** – Trigger builds on code push  
-* **Apache Tomcat / Localhost** – Target deployment environment  
-
+* **EC2 (Ubuntu) (Tomcat)**– Target deployment environment
 ---
 ## 🔌Plugins (at minimum)
 
@@ -46,7 +45,8 @@
 * GitHub repository for your Student App  
 * Jenkins server (Ubuntu or Windows) reachable by GitHub  
 * JDK 17 & Maven installed and configured in Jenkins  
-* Target server (optional) with Tomcat for deployment  
+* Target server (optional) with Tomcat for deployment
+* java application source code hosted on a Git repository (e.g., GitHub).
 
 ---
 
@@ -64,21 +64,54 @@
 
 ## 🪜 Step-by-Step Implementation
 
-### **Step 1: Prepare Jenkins Environment**
+### **Step 1: Launch two EC2 Instance**
 
-* Install **Java** and **Maven** on Jenkins server  
+* Create two EC2 instances in same VPC (Default).
 
+# 1.   Jenkins server
+
+   >>For Jenkins setup instructions, I’ve already created detailed documentation [click here](https://github.com/nikiimisal/Project-Jenkins-CI-CD-Setup-and-Build-Process)
+* Security Group:
+    * Jenkins Server → Port 8080 , 80 , 22
+
+* Install **Java** and **Maven** on Jenkins server  <br>
+in jenkins terminal run this commands
 ```bash
+sudo hostnamectl hostname jenkins
 sudo apt update
-sudo apt install openjdk-17-jdk -y
+sudo apt install openjdk-17-jdk -y     # (OPTIONAL)
 sudo apt install maven -y
 java -version
 mvn -version
 ```
 
-* Configure Jenkins → Global Tool Configuration  
-  - Add JDK → `jdk17`  
-  - Add Maven → `Maven3`  
+>>>There are two steps to install Maven: <br>
+i. Go inside the Jenkins server and install it through the terminal using commands.<br>
+ii. Or, install it through the Maven plugin in Jenkins.`Maven Integration` plugin<br>
+<br>
+
+>>After installing, go to:<br>
+Manage Jenkins → Global Tool Configuration → Maven → Add Maven<br>
+→ Give it a name (for example, `Maven3`)<br>
+→ Choose “Install automatically” or specify the Maven path manually.<br>
+
+# 2.  Tomcat Server
+
+* Security Group:
+    * Tomcat Server → Port 8080 , 80 , 22       <br>
+      
+in tomcat terminal run this commands
+
+```bash
+sudo hostnamectl hostname tomcat
+sudo apt update
+sudo apt install tomcat10 -y
+sudo systemctl start tomcat10
+sudo systemctl enable tomcat10
+java -version                              #if not avalible install it
+sudo apt install openjdk-17-jdk -y
+```
+
 
 <p align="center">
   <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/jenkins-tools-config.png?raw=true" width="700" alt="Jenkins Tools Configuration">
@@ -88,7 +121,7 @@ mvn -version
 
 ### **Step 2: Create GitHub Repository**
 
-* Repo Name: `student-app-java-cicd`  
+* Repo Name: `student-app-java-cicd`   [Repo](https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins)  
 * Branch: `main`
 
 #### **Add Webhook**
@@ -120,12 +153,12 @@ mvn -version
 ### **Step 4: Create Jenkins Pipeline Job**
 
 * Item Name: `student-app-java-cicd`  
-* Type: **Pipeline**  
-* Trigger: *GitHub hook trigger for GITScm polling*  
+* Item-Type: **Pipeline**  
+* Enable Trigger: *GitHub hook trigger for GITScm polling*  
 * Definition: *Pipeline script from SCM*  
 * Repository URL: `https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git`  
 * Branch: `main`  
-* Script Path: `Jenkinsfile`  
+* Script Path: `jenkinsfile`  
 
 <p align="center">
   <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/pipeline-config.png?raw=true" width="700" alt="Jenkins Pipeline Config">
@@ -139,46 +172,38 @@ mvn -version
 pipeline {
     agent any
 
-    tools {
-        jdk 'jdk17'
-        maven 'Maven3'
-    }
-
     environment {
-        SERVER_IP      = '16.171.161.138'
-        SSH_CREDENTIAL = 'java-app-key'
-        REPO_URL       = 'https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git'
-        BRANCH         = 'main'
-        REMOTE_USER    = 'ubuntu'
-        REMOTE_PATH    = '/home/ubuntu/student-app'
+        SERVER_IP    = '13.62.103.164'
+        SSH_CRED_ID  = 'node-app-key'
+        TOMCAT_PATH  = '/var/lib/tomcat10/webapps'
+        TOMCAT_SVC   = 'tomcat10'
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: "${BRANCH}", url: "${REPO_URL}"
+                git branch: 'main', url: 'https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git'
             }
         }
 
-        stage('Build & Test') {
+        stage('Build WAR') {
             steps {
-                sh 'mvn clean test'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Package Application') {
+        stage('Deploy to Tomcat') {
             steps {
-                sh 'mvn package'
-            }
-        }
-
-        stage('Deploy to Server') {
-            steps {
-                sshagent([SSH_CREDENTIAL]) {
+                sshagent([SSH_CRED_ID]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} 'mkdir -p ${REMOTE_PATH}'
-                        scp -o StrictHostKeyChecking=no target/*.war ${REMOTE_USER}@${SERVER_IP}:${REMOTE_PATH}/
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} 'sudo systemctl restart tomcat9 || echo "Restart manually if required"'
+                        WAR_FILE=\$(ls target/*.war | head -n 1)
+                        scp -o StrictHostKeyChecking=no \$WAR_FILE ubuntu@${SERVER_IP}:/tmp/
+                        ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} '
+                            sudo rm -rf ${TOMCAT_PATH}/*
+                            sudo mv /tmp/*.war ${TOMCAT_PATH}/ROOT.war
+                            sudo chown tomcat:tomcat ${TOMCAT_PATH}/ROOT.war
+                            sudo systemctl restart ${TOMCAT_SVC}
+                        '
                     """
                 }
             }
@@ -187,10 +212,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Application deployed successfully!'
+            echo "App deployed! Visit: http://${SERVER_IP}:8080/"
         }
         failure {
-            echo '❌ Deployment failed. Check logs.'
+            echo "Deployment failed."
         }
     }
 }
@@ -204,9 +229,7 @@ pipeline {
 ```bash
 git init
 git add .
-git commit -m "Initial Java CI/CD setup"
-git branch -M main
-git remote add origin https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git
+git commit -m ""
 git push -u origin main
 ```
 
@@ -224,7 +247,7 @@ git push -u origin main
   <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/build-success.png?raw=true" width="700" alt="Pipeline Success">
 </p>
 
-If build fails, check the **Console Output** to find and fix errors.
+>If build fails, check the **Console Output** to find and fix errors.
 
 ---
 
@@ -233,7 +256,7 @@ If build fails, check the **Console Output** to find and fix errors.
 Open in browser:  
 If deployed on Tomcat →  
 ```
-http://<Your-Server-IP>:8080/student-app
+http://<Your-Tomcat-Server-IP>:8080/student-app
 ```
 
 If it’s a jar-based app:  
