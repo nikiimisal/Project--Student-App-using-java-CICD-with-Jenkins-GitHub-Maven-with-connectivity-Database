@@ -68,7 +68,7 @@
 
 * Create two EC2 instances in same VPC (Default).
 
-# 1.   Jenkins server
+### A.   Jenkins server
 
    >>For Jenkins setup instructions, I’ve already created detailed documentation [click here](https://github.com/nikiimisal/Project-Jenkins-CI-CD-Setup-and-Build-Process)
 * Security Group:
@@ -95,7 +95,7 @@ Manage Jenkins → Global Tool Configuration → Maven → Add Maven<br>
 → Give it a name (for example, `Maven3`)<br>
 → Choose “Install automatically” or specify the Maven path manually.<br>
 
-# 2.  Tomcat Server
+### B.  Tomcat Server
 
 * Security Group:
     * Tomcat Server → Port 8080 , 80 , 22       <br>
