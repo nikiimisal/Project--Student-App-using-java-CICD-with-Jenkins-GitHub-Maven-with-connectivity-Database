@@ -5,7 +5,7 @@
 
 ---
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/ci-cd-java-banner.png?raw=true" width="700" alt="Java CI/CD Pipeline Overview">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/NM.png?raw=true" width="700" alt="Java CI/CD Pipeline Overview">
 </p>
 
 ## 🧩 Overview
@@ -114,7 +114,7 @@ sudo apt install openjdk-17-jdk -y
 
 
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/jenkins-tools-config.png?raw=true" width="700" alt="Jenkins Tools Configuration">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20111313.png?raw=true" width="700" alt="Jenkins Tools Configuration">
 </p>
 
 ---
@@ -128,9 +128,14 @@ sudo apt install openjdk-17-jdk -y
 
 * Payload URL → `http://<JENKINS_PUBLIC_IP>:8080/github-webhook/`  
 
+
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/github-webhook.png?raw=true" width="700" alt="GitHub Webhook Setup">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20111405.png?raw=true" width="700" alt="GitHub">
 </p>
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20111437.png?raw=true" width="700" alt="GitHub Webhook Setup">
+</p>
+
 
 ---
 
@@ -145,7 +150,7 @@ sudo apt install openjdk-17-jdk -y
    * Paste your private key  
 
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/jenkins-credentials.png?raw=true" width="700" alt="SSH Credentials">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-06%20143758.png?raw=true" width="700" alt="SSH Credentials">
 </p>
 
 ---
@@ -161,7 +166,11 @@ sudo apt install openjdk-17-jdk -y
 * Script Path: `jenkinsfile`  
 
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/pipeline-config.png?raw=true" width="700" alt="Jenkins Pipeline Config">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20111900.png?raw=true" width="700" alt="Jenkins Pipeline Config">
+</p>
+
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20112137.png?raw=true" width="700" alt="Jenkins Pipeline Config">
 </p>
 
 ---
@@ -244,7 +253,7 @@ git push -u origin main
 * Watch the **Pipeline Stage View**  
 
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/build-success.png?raw=true" width="700" alt="Pipeline Success">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20080746.png?raw=true" width="700" alt="Pipeline Success">
 </p>
 
 >If build fails, check the **Console Output** to find and fix errors.
@@ -265,7 +274,7 @@ java -jar target/student-app.jar
 ```
 
 <p align="center">
-  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/app-running.png?raw=true" width="700" alt="Java App Running">
+  <img src="https://github.com/nikiimisal/Project--Student-App-using-java-CICD-with-Jenkins-GitHub-Maven-with-connectivity-Database/blob/main/img/Screenshot%202025-11-09%20080841.png?raw=true" width="700" alt="Java App Running">
 </p>
 
 ---
