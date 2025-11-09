@@ -90,7 +90,7 @@ i. Go inside the Jenkins server and install it through the terminal using comman
 ii. Or, install it through the Maven plugin in Jenkins.`Maven Integration` plugin<br>
 <br>
 
->>After installing, go to:<br>
+>>After plugin installing, go to:<br>
 Manage Jenkins → Global Tool Configuration → Maven → Add Maven<br>
 → Give it a name (for example, `Maven3`)<br>
 → Choose “Install automatically” or specify the Maven path manually.<br>
