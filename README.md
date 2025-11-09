@@ -1,77 +1,139 @@
+# 🚀 Student App — CI/CD with Jenkins, GitHub & Maven 
 
-# 🚀 Student App — CI/CD with Jenkins, GitHub & Maven
-
-> This project demonstrates a **complete CI/CD pipeline** for a **Java Student Management Application** using **Jenkins, GitHub, and Maven**.  
-> The goal is to automate the process of **building, testing, and deploying** Java applications with continuous integration and delivery.
+>This project demonstrates a **complete CI/CD pipeline** for a **Java (Maven)** application using **Jenkins and GitHub Webhooks**, fully automated from **code push → build → test → deploy**.<br>
+>This documentation is beginner-friendly as well as professional.
 
 ---
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/ci-cd-java-banner.png?raw=true" width="700" alt="Java CI/CD Pipeline Overview">
+</p>
 
 ## 🧩 Overview
 
-This Student App is built using **Java** with **Maven** as the build automation tool.  
-The project integrates **GitHub** for source control and **Jenkins** for automating the CI/CD pipeline.  
+---
 
-Whenever a developer pushes code to GitHub, Jenkins automatically:
-1. Pulls the latest code
-2. Builds and tests it using Maven
-3. Packages the `.jar` or `.war` file
-4. Deploys it to the configured environment (local/Tomcat)
+* Automates the deployment of a **Java Maven application** using Jenkins CI/CD.  
+* Integrates **GitHub Webhooks** to automatically trigger builds when new code is pushed.  
+* Pulls the latest source code from the GitHub repository.  
+* Builds and tests the Java project using **Maven**.  
+* Packages the application into a `.jar` or `.war` file.  
+* Deploys the application automatically to the target environment (Tomcat / Local).  
+* Ensures **Continuous Integration** and **Continuous Delivery (CI/CD)** for reliable and fast deployments.  
+* Provides a fully automated workflow — from code commit to deployment.
 
 ---
 
-## ⚙️ Tech Stack
+## 🧰 Tools & Technologies
 
-| Component | Technology Used |
-|------------|-----------------|
-| **Language** | Java |
-| **Build Tool** | Maven |
-| **CI/CD Tool** | Jenkins |
-| **Version Control** | Git & GitHub |
-| **Integration** | GitHub Webhook |
-| **Deployment** | Tomcat / Local Server |
+* **Jenkins** – CI/CD automation  
+* **Java (JDK 17)** – Application runtime  
+* **Maven** – Build automation tool  
+* **GitHub Webhooks** – Trigger builds on code push  
+* **Apache Tomcat / Localhost** – Target deployment environment  
+
+---
+## 🔌Plugins (at minimum)
+
+* **Git Plugin** → For repo clone/pull mechanism  
+* **GitHub Plugin** → Auto-trigger builds via Webhook (on push)  
+* **Pipeline Plugin** → Defines CI/CD pipeline stages  
+* **SSH Agent Plugin** → Enables remote server access (for deployment)  
+* **Pipeline Stage View Plugin** → Visual stage-wise pipeline status  
+
+---
+## 📋 Prerequisites
+
+* GitHub repository for your Student App  
+* Jenkins server (Ubuntu or Windows) reachable by GitHub  
+* JDK 17 & Maven installed and configured in Jenkins  
+* Target server (optional) with Tomcat for deployment  
 
 ---
 
-## 🧱 Project Structure
+## High-level CI/CD Flow
 
-```groovy
-.
-├── src/
-│ ├── main/
-│ │ └── java/...
-│ └── test/
-├── pom.xml
-├── Jenkinsfile
-├── README.md
+1. Developer pushes code to the `main` branch  
+2. GitHub Webhook triggers Jenkins build  
+3. Jenkins pulls the latest code from GitHub  
+4. Jenkins builds and tests the app using Maven  
+5. Jenkins packages the `.jar` / `.war` file  
+6. Jenkins deploys the app to the target server (Tomcat or Local)  
+7. Notifications sent on success/failure  
 
+---
+
+## 🪜 Step-by-Step Implementation
+
+### **Step 1: Prepare Jenkins Environment**
+
+* Install **Java** and **Maven** on Jenkins server  
+
+```bash
+sudo apt update
+sudo apt install openjdk-17-jdk -y
+sudo apt install maven -y
+java -version
+mvn -version
 ```
 
+* Configure Jenkins → Global Tool Configuration  
+  - Add JDK → `jdk17`  
+  - Add Maven → `Maven3`  
+
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/jenkins-tools-config.png?raw=true" width="700" alt="Jenkins Tools Configuration">
+</p>
 
 ---
 
-## 🔄 Workflow
+### **Step 2: Create GitHub Repository**
 
-### 🔹 Step 1 — Code Push
-The developer commits and pushes code changes to the **main** branch of the GitHub repository.
+* Repo Name: `student-app-java-cicd`  
+* Branch: `main`
 
-### 🔹 Step 2 — GitHub Webhook Trigger
-A **GitHub Webhook** notifies **Jenkins** about the new push event.
+#### **Add Webhook**
 
-### 🔹 Step 3 — Jenkins Pipeline Execution
-The Jenkins pipeline starts automatically and performs:
-- **Checkout Code** from GitHub  
-- **Build & Test** the project with Maven  
-- **Package** the final `.jar` or `.war`  
-- **Deploy** to target environment  
+* Payload URL → `http://<JENKINS_PUBLIC_IP>:8080/github-webhook/`  
 
-### 🔹 Step 4 — Notifications
-Jenkins displays the build status.  
-- ✅ On success → deployed successfully  
-- ❌ On failure → developer is notified immediately  
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/github-webhook.png?raw=true" width="700" alt="GitHub Webhook Setup">
+</p>
 
 ---
 
-## 🧰 Jenkinsfile (Declarative Pipeline)
+### **Step 3: Add SSH Credentials in Jenkins**
+
+> Create New Credentials  
+1. Navigate → Manage Jenkins → Credentials → Global  
+2. Add → **SSH Username with private key**  
+
+   * ID: `java-app-key`  
+   * Username: `ubuntu`  
+   * Paste your private key  
+
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/jenkins-credentials.png?raw=true" width="700" alt="SSH Credentials">
+</p>
+
+---
+
+### **Step 4: Create Jenkins Pipeline Job**
+
+* Item Name: `student-app-java-cicd`  
+* Type: **Pipeline**  
+* Trigger: *GitHub hook trigger for GITScm polling*  
+* Definition: *Pipeline script from SCM*  
+* Repository URL: `https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git`  
+* Branch: `main`  
+* Script Path: `Jenkinsfile`  
+
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/pipeline-config.png?raw=true" width="700" alt="Jenkins Pipeline Config">
+</p>
+
+---
+
+### **Step 5: Jenkinsfile Configuration**
 
 ```groovy
 pipeline {
@@ -82,74 +144,139 @@ pipeline {
         maven 'Maven3'
     }
 
+    environment {
+        SERVER_IP      = '16.171.161.138'
+        SSH_CREDENTIAL = 'java-app-key'
+        REPO_URL       = 'https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git'
+        BRANCH         = 'main'
+        REMOTE_USER    = 'ubuntu'
+        REMOTE_PATH    = '/home/ubuntu/student-app'
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git'
+                git branch: "${BRANCH}", url: "${REPO_URL}"
             }
         }
 
-        stage('Build') {
+        stage('Build & Test') {
             steps {
-                echo 'Building project using Maven...'
-                sh 'mvn clean install'
+                sh 'mvn clean test'
             }
         }
 
-        stage('Test') {
+        stage('Package Application') {
             steps {
-                echo 'Running tests...'
-                sh 'mvn test'
-            }
-        }
-
-        stage('Package') {
-            steps {
-                echo 'Packaging application...'
                 sh 'mvn package'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Server') {
             steps {
-                echo 'Deploying application...'
-                // Example deployment step
-                // sh 'cp target/student-app.war /var/lib/tomcat9/webapps/'
+                sshagent([SSH_CREDENTIAL]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} 'mkdir -p ${REMOTE_PATH}'
+                        scp -o StrictHostKeyChecking=no target/*.war ${REMOTE_USER}@${SERVER_IP}:${REMOTE_PATH}/
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} 'sudo systemctl restart tomcat9 || echo "Restart manually if required"'
+                    """
+                }
             }
         }
     }
 
     post {
         success {
-            echo '✅ Build and Deployment Successful!'
+            echo '✅ Application deployed successfully!'
         }
         failure {
-            echo '❌ Build Failed! Developer notified.'
+            echo '❌ Deployment failed. Check logs.'
         }
     }
 }
-
 ```
-# Clone the repository
-git clone https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git
-cd student-app-using-java--CICD-Jenkins
+>NOTE: Replace `SERVER_IP`, `SSH_CREDENTIAL`, and paths as per your setup.
 
-# Build the project
-mvn clean install
+---
 
-# Run the application
+### **Step 6: Push Code to GitHub**
+
+```bash
+git init
+git add .
+git commit -m "Initial Java CI/CD setup"
+git branch -M main
+git remote add origin https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git
+git push -u origin main
+```
+
+>Now when code is pushed, GitHub Webhook triggers Jenkins → Jenkins pulls latest code → builds with Maven → tests → packages → deploys automatically.
+
+---
+
+### **Step 7: Verify Jenkins Build**
+
+* Open Jenkins Dashboard  
+* Click on **Build Now**  
+* Watch the **Pipeline Stage View**  
+
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/build-success.png?raw=true" width="700" alt="Pipeline Success">
+</p>
+
+If build fails, check the **Console Output** to find and fix errors.
+
+---
+
+### **Step 8: Verify Application**
+
+Open in browser:  
+If deployed on Tomcat →  
+```
+http://<Your-Server-IP>:8080/student-app
+```
+
+If it’s a jar-based app:  
+```bash
 java -jar target/student-app.jar
+```
 
-# 🧪 How to Run Locally
+<p align="center">
+  <img src="https://github.com/nikiimisal/Project-Student-App-using-java-CICD-with-Jenkins-GitHub-Maven/blob/main/img/app-running.png?raw=true" width="700" alt="Java App Running">
+</p>
 
-# Clone the repository
-git clone https://github.com/nikiimisal/student-app-using-java--CICD-Jenkins.git
-cd student-app-using-java--CICD-Jenkins
+---
 
-# Build the project
-mvn clean install
+## 🧠 Troubleshooting
 
-# Run the application
-java -jar target/student-app.jar
+| Issue | Solution |
+|-------|-----------|
+| Webhook not triggering | Ensure Jenkins Public IP accessible from GitHub |
+| Maven not found | Check Jenkins → Global Tool Config |
+| SSH Permission denied | Verify private key and username |
+| Jenkins build fails | Check Jenkins console log |
+| Tomcat not restarting | Restart manually or check service logs |
 
->If you are using Tomcat, copy the generated .war file into the webapps directory.
+---
+
+## 🎯 Conclusion
+
+By integrating **Jenkins** with **GitHub Webhooks** and **Maven**, this setup enables **fully automated Java application deployments**.  
+Every code push triggers Jenkins to build, test, and deploy — resulting in faster and more reliable delivery cycles.
+
+✅ **Key Benefits:**
+* Full CI/CD automation  
+* Continuous Integration and Delivery  
+* Reduced manual intervention  
+* Repeatable, reliable builds  
+
+---
+
+**Author:** Nikhil Dipak Misal 😎  
+**License:** MIT  
+
+---
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0072ff,100:00c6ff&height=120&section=footer"/>
+</p>
